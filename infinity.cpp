@@ -8,8 +8,8 @@
 #include <curl/curl.h>
 
 //#define ENABLE_LOG
-#include "logc.h"
-#include "network_tools.h"
+#include "clog.h"
+#include "network_utils.h"
 #include "init.h"
 using namespace std;
 
