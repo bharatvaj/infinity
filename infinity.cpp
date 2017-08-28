@@ -5,7 +5,6 @@
 #include<fstream>
 #include<unistd.h>
 #include<signal.h>
-#include <curl/curl.h>
 
 #define ENABLE_LOG
 #include "clog.h"
@@ -21,17 +20,21 @@ void print(string str, int servfd){
     write(servfd, str.c_str(), str.size());
 }
 
-/*
+
 char *scan(int servfd){
-    char *buf = (char *)malloc(50);
+    char *buf = (char *)malloc(256);
     int bytes_received = 0;
+    int n = 0;
     while((bytes_received = read(servfd, buf, 1)) != 0){
-      cout << buf << endl;
+      n++;
+      buf[n] = '\0';
     }
+    buf[n] = '\0';
+    cout << buf << endl;
     return buf;
 }
-*/
 
+/*
 char *scan(int servfd){
   char *buffer = (char *)malloc(256);
 memset(buffer, 0, 256);
@@ -57,6 +60,7 @@ while(bytesLeft > 0)
 cout << buffer << endl;
 return buffer;
 }
+*/
 
 bool checkCode(const char *msg, const char *code){
     if(msg[0] == code[0] &&
@@ -67,7 +71,18 @@ bool checkCode(const char *msg, const char *code){
 }
 
 int auth_cnt = 0;
+
 /*
+bool authenticate(int servfd, string user, string pass){
+    auth_cnt++;
+    if(pass == "guess"){
+        cout << "\x1b[32mpassword found: " << pass << " | tries: "<< auth_cnt << "\x1b[0m" << endl;
+        return true;
+    }
+    return false;
+}
+*/
+
 bool authenticate(int servfd, string user, string pass){
     auth_cnt++;
     log_inf(F_CRY, "submitting username");
@@ -88,17 +103,9 @@ bool authenticate(int servfd, string user, string pass){
     log_inf(F_CRY, "credentials accepted");
     return true;
 }
-*/
 
-bool authenticate(int servfd, string user, string pass){
 
-    auth_cnt++;
-    if(pass == "admin"){
-        cout << "password found: " << pass << " | tries: "<< auth_cnt << endl;
-        return true;
-    }
-    return false;
-}
+
 
 int tryKnown(int servfd){
     ifstream in("login.txt");
@@ -157,16 +164,28 @@ int bruteforceLogin(int servfd, int user_range[2], int pass_range[2]){
                 cout << "Current set with range: " << _pas_r << " passed with pass " << pass << endl;
                 return 0;
             }
-            cout << "Current set with range: " << _pas_r << " failed" << endl;
+            cout << "Current set with range: " << "\x1b[31m" << _pas_r << " failed\x1b[0m" << endl;
         }
     //}
     return -1;
 }
 
+int time_elapsed(){
+  return 0;
+}
+
+int time_remaining(){
+  return 0;
+}
+
 void exit_handler(int sig){
-    cout << "tries: " << auth_cnt << endl;
+    cout << "tries: " << auth_cnt;
     cout << endl << "saving results for later use..." << endl;
     exit(sig);
+}
+
+void try_handler(int sig){
+    cout << "tries: " << auth_cnt << " | time elapsed: " << time_elapsed() << " | time remaining: " << time_remaining() << endl;
 }
 
 int main(int argc, char *argv[]){
@@ -183,7 +202,7 @@ int main(int argc, char *argv[]){
 
 init();
     signal(SIGINT, exit_handler);
-
+    signal(SIGQUIT, try_handler);
     int servfd = -1;
     if((servfd = connect_server(RHOST.c_str(), RPORT)) < 0 ){
         print("Cannot connect to the server");
