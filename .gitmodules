@@ -1,0 +1,6 @@
+[submodule "clog"]
+	path = clog
+	url = https://github.com/bharatph/clog
+[submodule "Node"]
+	path = Node
+	url = https://github.com/bharatph/Node

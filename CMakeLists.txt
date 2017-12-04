@@ -1,13 +1,16 @@
-cmake_minimum_required(VERSION 2.8)
-
+cmake_minimum_required(VERSION 3.0)
 project(infinity)
 
-find_package(Threads REQUIRED)
+set(CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_FLAGS "-Wall")
 
-set (CMAKE_CXX_FLAGS "-fPIC -Wall")
+option(ENABLE_CLOG "Enables logging" ON)
 
-include_directories(${PROJECT_SOURCE_DIR})
+#clog
+add_subdirectory(clog ${CMAKE_SOURCE_DIR}/build/clog)
 
-add_executable(infinity infinity.cpp)
+#Node
+add_subdirectory(Node ${CMAKE_SOURCE_DIR}/build/Node)
 
-target_link_libraries(infinity ${CMAKE_THREAD_LIBS_INIT})
+#app
+add_subdirectory(app ${CMAKE_SOURCE_DIR}/build/app)

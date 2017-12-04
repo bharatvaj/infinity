@@ -4,7 +4,9 @@
 #include<iomanip>
 #include<fstream>
 #include<signal.h>
+extern "C" {
 #include <clog/clog.h>
+}
 #include <Node/Node.hpp>
 #include "init.h"
 
